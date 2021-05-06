@@ -369,7 +369,7 @@ class CoboltModDPL(CoboltLaser):
 
 
 def listLasers():
-    '''Return a list of laser objects for all cobolt lasers  '''
+    '''Return a list of laser objects for all cobolt lasers '''
     lasers=[]
     ports=list_ports.comports()
     for port in ports:
