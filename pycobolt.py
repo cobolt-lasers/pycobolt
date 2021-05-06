@@ -106,7 +106,7 @@ class CoboltLaser():
             self.adress.close()
             self.serialNumber=None
             self.modelNumber=None
-            #clear sn & mn on disconnect?
+
          
     def turnOn(self):
         '''turn on the laser with the autostart sequence.The laser will await the TEC setpoints and pass a warm-up state'''
@@ -235,14 +235,14 @@ class CoboltLaser():
 
             :returns:
                 The string recieved from the laser
-                "SYNTAX ERROR: No response" on a failed attempt.
+                "Syntax Error: No response" on a failed attempt.
+                "Syntax Error: Write failed" if no connection is available
         """
         time_start = time.perf_counter()
         message += "\r"
         try:
             self.adress.write(message.encode() )
-        except: #handle error correctly
-            #raise Exception('Write Failed') #returnera sträng eller fel?
+        except: 
             return 'Error: write failed'
 
 
@@ -353,7 +353,7 @@ class CoboltModDPL(CoboltLaser):
         lowI=float(self.sendCmd(f'glth?'))
         return [highI,lowI] 
 
-    def readModTec(self):
+    def getModTec(self):
         '''Read the temperature of the modulation TEC in °C'''
         return float(self.sendCmd(f'rtec4t?'))
 
@@ -369,7 +369,7 @@ class CoboltModDPL(CoboltLaser):
 
 
 def listLasers():
-    '''Return a list of laser objects for all cobolt lasers '''
+    '''Return a list of laser objects for all cobolt lasers connected to the computer '''
     lasers=[]
     ports=list_ports.comports()
     for port in ports:
