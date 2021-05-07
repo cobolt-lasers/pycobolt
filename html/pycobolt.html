@@ -279,8 +279,8 @@ class CoboltLaser():
         return &#34;Syntax Error: No response&#34;
 
 
-class Cobolt_06MLD(CoboltLaser):
-    &#39;&#39;&#39;For lasers of type MLD&#39;&#39;&#39;
+class Cobolt06MLD(CoboltLaser):
+    &#39;&#39;&#39;For lasers of type 06-MLD&#39;&#39;&#39;
     def __init__(self,port=None,serialNumber=None):
         super().__init__(port,serialNumber)
 
@@ -332,8 +332,8 @@ class Cobolt_06MLD(CoboltLaser):
         
 
 
-class Cobolt_06DPL(CoboltLaser):
-    &#39;&#39;&#39;For lasers of type ModDPL&#39;&#39;&#39;
+class Cobolt06DPL(CoboltLaser):
+    &#39;&#39;&#39;For lasers of type 06-DPL&#39;&#39;&#39;
     def __init__(self,port=None,serialNumber=None):
         super().__init__(port,serialNumber)
 
@@ -440,6 +440,486 @@ def list_lasers():
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="pycobolt.Cobolt06DPL"><code class="flex name class">
+<span>class <span class="ident">Cobolt06DPL</span></span>
+<span>(</span><span>port=None, serialNumber=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>For lasers of type 06-DPL</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Cobolt06DPL(CoboltLaser):
+    &#39;&#39;&#39;For lasers of type 06-DPL&#39;&#39;&#39;
+    def __init__(self,port=None,serialNumber=None):
+        super().__init__(port,serialNumber)
+
+    def modulation_mode(self,highI=None):
+        &#39;&#39;&#39;Enter Modulation mode, with possibiity to set the modulation high current level in mA (**kwarg)&#39;&#39;&#39;
+        if highI!=None:
+            self.sendCmd(f&#39;smc {highI}&#39;)
+        return self.sendCmd(f&#39;em&#39;)
+
+    def digital_modulation(self,enable):
+        &#39;&#39;&#39;Enable digital modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
+        return self.sendCmd(f&#39;sdmes {enable}&#39;)
+
+    def analog_modulation(self,enable):
+        &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39; 
+        return self.sendCmd(f&#39;sames {enable}&#39;)
+
+    def get_modulation_state(self):
+        &#39;&#39;&#39;get the laser modulation settings as [analog, digital]&#39;&#39;&#39;
+        dm=self.sendCmd(f&#39;gdmes?&#39;)
+        am=self.sendCmd(f&#39;games?&#39;)
+        return [am,dm]
+
+    def set_modulation_current_high(self,highI):
+        &#39;&#39;&#39;Set the modulation high current in mA &#39;&#39;&#39;
+        return self.sendCmd(f&#39;smc {highI}&#39;)
+    
+    def set_modulation_current_low(self,lowI):
+        &#39;&#39;&#39;Set the modulation low current in mA &#39;&#39;&#39;
+        return self.sendCmd(f&#39;slth {highI}&#39;)
+    
+    def get_modulation_current(self):
+        &#39;&#39;&#39;Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]&#39;&#39;&#39;
+        highI=float(self.sendCmd(f&#39;gmc?&#39;))
+        lowI=float(self.sendCmd(f&#39;glth?&#39;))
+        return [highI,lowI] 
+
+    def get_modulation_tec(self):
+        &#39;&#39;&#39;Read the temperature of the modulation TEC in °C&#39;&#39;&#39;
+        return float(self.sendCmd(f&#39;rtec4t?&#39;))
+
+    def set_modulation_tec(self, temperature):
+        &#39;&#39;&#39;Set the temperature of the modulation TEC in °C&#39;&#39;&#39;
+        return self.sendCmd(f&#39;stec4t {temperature}&#39;)
+
+    def get_modualtion_tec_setpoint(self):
+        &#39;&#39;&#39;Get the setpoint of the modulation TEC in °C&#39;&#39;&#39;
+        return float(self.sendCmd(f&#39;gtec4t?&#39;))</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pycobolt.Cobolt06DPL.analog_modulation"><code class="name flex">
+<span>def <span class="ident">analog_modulation</span></span>(<span>self, enable)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enable analog modulation mode by enable=1, turn off by enable=0</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analog_modulation(self,enable):
+    &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39; 
+    return self.sendCmd(f&#39;sames {enable}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.digital_modulation"><code class="name flex">
+<span>def <span class="ident">digital_modulation</span></span>(<span>self, enable)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enable digital modulation mode by enable=1, turn off by enable=0</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def digital_modulation(self,enable):
+    &#39;&#39;&#39;Enable digital modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
+    return self.sendCmd(f&#39;sdmes {enable}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.get_modualtion_tec_setpoint"><code class="name flex">
+<span>def <span class="ident">get_modualtion_tec_setpoint</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the setpoint of the modulation TEC in °C</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_modualtion_tec_setpoint(self):
+    &#39;&#39;&#39;Get the setpoint of the modulation TEC in °C&#39;&#39;&#39;
+    return float(self.sendCmd(f&#39;gtec4t?&#39;))</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.get_modulation_current"><code class="name flex">
+<span>def <span class="ident">get_modulation_current</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_modulation_current(self):
+    &#39;&#39;&#39;Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]&#39;&#39;&#39;
+    highI=float(self.sendCmd(f&#39;gmc?&#39;))
+    lowI=float(self.sendCmd(f&#39;glth?&#39;))
+    return [highI,lowI] </code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.get_modulation_state"><code class="name flex">
+<span>def <span class="ident">get_modulation_state</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>get the laser modulation settings as [analog, digital]</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_modulation_state(self):
+    &#39;&#39;&#39;get the laser modulation settings as [analog, digital]&#39;&#39;&#39;
+    dm=self.sendCmd(f&#39;gdmes?&#39;)
+    am=self.sendCmd(f&#39;games?&#39;)
+    return [am,dm]</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.get_modulation_tec"><code class="name flex">
+<span>def <span class="ident">get_modulation_tec</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read the temperature of the modulation TEC in °C</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_modulation_tec(self):
+    &#39;&#39;&#39;Read the temperature of the modulation TEC in °C&#39;&#39;&#39;
+    return float(self.sendCmd(f&#39;rtec4t?&#39;))</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.modulation_mode"><code class="name flex">
+<span>def <span class="ident">modulation_mode</span></span>(<span>self, highI=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enter Modulation mode, with possibiity to set the modulation high current level in mA (**kwarg)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def modulation_mode(self,highI=None):
+    &#39;&#39;&#39;Enter Modulation mode, with possibiity to set the modulation high current level in mA (**kwarg)&#39;&#39;&#39;
+    if highI!=None:
+        self.sendCmd(f&#39;smc {highI}&#39;)
+    return self.sendCmd(f&#39;em&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.set_modulation_current_high"><code class="name flex">
+<span>def <span class="ident">set_modulation_current_high</span></span>(<span>self, highI)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the modulation high current in mA</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_modulation_current_high(self,highI):
+    &#39;&#39;&#39;Set the modulation high current in mA &#39;&#39;&#39;
+    return self.sendCmd(f&#39;smc {highI}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.set_modulation_current_low"><code class="name flex">
+<span>def <span class="ident">set_modulation_current_low</span></span>(<span>self, lowI)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the modulation low current in mA</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_modulation_current_low(self,lowI):
+    &#39;&#39;&#39;Set the modulation low current in mA &#39;&#39;&#39;
+    return self.sendCmd(f&#39;slth {highI}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06DPL.set_modulation_tec"><code class="name flex">
+<span>def <span class="ident">set_modulation_tec</span></span>(<span>self, temperature)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the temperature of the modulation TEC in °C</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_modulation_tec(self, temperature):
+    &#39;&#39;&#39;Set the temperature of the modulation TEC in °C&#39;&#39;&#39;
+    return self.sendCmd(f&#39;stec4t {temperature}&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pycobolt.CoboltLaser.clear_fault" href="#pycobolt.CoboltLaser.clear_fault">clear_fault</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.connect" href="#pycobolt.CoboltLaser.connect">connect</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.constant_current" href="#pycobolt.CoboltLaser.constant_current">constant_current</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.constant_power" href="#pycobolt.CoboltLaser.constant_power">constant_power</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.disconnect" href="#pycobolt.CoboltLaser.disconnect">disconnect</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_current" href="#pycobolt.CoboltLaser.get_current">get_current</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_current_setpoint" href="#pycobolt.CoboltLaser.get_current_setpoint">get_current_setpoint</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_fault" href="#pycobolt.CoboltLaser.get_fault">get_fault</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_mode" href="#pycobolt.CoboltLaser.get_mode">get_mode</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_ophours" href="#pycobolt.CoboltLaser.get_ophours">get_ophours</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_power" href="#pycobolt.CoboltLaser.get_power">get_power</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_power_setpoint" href="#pycobolt.CoboltLaser.get_power_setpoint">get_power_setpoint</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_state" href="#pycobolt.CoboltLaser.get_state">get_state</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.interlock" href="#pycobolt.CoboltLaser.interlock">interlock</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.is_connected" href="#pycobolt.CoboltLaser.is_connected">is_connected</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.is_on" href="#pycobolt.CoboltLaser.is_on">is_on</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.send_cmd" href="#pycobolt.CoboltLaser.send_cmd">send_cmd</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.set_current" href="#pycobolt.CoboltLaser.set_current">set_current</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.set_power" href="#pycobolt.CoboltLaser.set_power">set_power</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.turn_off" href="#pycobolt.CoboltLaser.turn_off">turn_off</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.turn_on" href="#pycobolt.CoboltLaser.turn_on">turn_on</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="pycobolt.Cobolt06MLD"><code class="flex name class">
+<span>class <span class="ident">Cobolt06MLD</span></span>
+<span>(</span><span>port=None, serialNumber=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>For lasers of type 06-MLD</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Cobolt06MLD(CoboltLaser):
+    &#39;&#39;&#39;For lasers of type 06-MLD&#39;&#39;&#39;
+    def __init__(self,port=None,serialNumber=None):
+        super().__init__(port,serialNumber)
+
+    def modulation_mode(self,power=None):
+        &#39;&#39;&#39;enter modulation mode with the possibility  to set modulation power in mW&#39;&#39;&#39;
+        if power!=None:
+            self.sendCmd(f&#39;slmp {power}&#39;)
+        return self.sendCmd(f&#39;em&#39;)
+
+    def digital_modulation(self,enable):
+        &#39;&#39;&#39;Enable digital modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
+        return self.sendCmd(f&#39;sdmes {enable}&#39;)
+
+    def analog_modulation(self,enable):
+        &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39; 
+        return self.sendCmd(f&#39;sames {enable}&#39;)
+    
+    def on_off_modulation(self,enable):
+        &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
+        if enable==1:
+            return self.sendCmd(&#39;eoom&#39;)
+        elif enable==0:
+            return self.sendCmd(&#39;xoom&#39;)
+
+    def get_modulation_state(self,type):
+        &#39;&#39;&#39;get the laser modulation settings as [analog, digital]&#39;&#39;&#39;
+        dm=self.sendCmd(f&#39;gdmes?&#39;)
+        am=self.sendCmd(f&#39;games?&#39;)
+        return [am,dm]
+
+    def set_modulation_power(self,power):
+        &#39;&#39;&#39;set the modulation power in mW&#39;&#39;&#39;
+        return self.sendCmd(f&#39;slmp {power}&#39;)
+    
+    def get_modulation_power(self):
+        &#39;&#39;&#39;get the modulation power setpoint in mW&#39;&#39;&#39;
+        return float(self.sendCmd(f&#39;glmp?&#39;))
+
+    def set_analog_impedance(self,arg):
+        &#39;&#39;&#39;Set the impedance of the analog modulation by \n
+        arg=0 for HighZ and \n
+        arg=1 for 50 Ohm &#39;&#39;&#39;
+        return self.sendCmd(f&#39;salis {arg}&#39;)
+        
+    def get_analog_impedance(self,arg):
+        &#39;&#39;&#39;Get the impedance of the analog modulation \n
+        return: 0 for HighZ and 1 for 50 Ohm &#39;&#39;&#39;
+        return self.sendCmd(f&#39;salis {arg}&#39;)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pycobolt.Cobolt06MLD.analog_modulation"><code class="name flex">
+<span>def <span class="ident">analog_modulation</span></span>(<span>self, enable)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enable analog modulation mode by enable=1, turn off by enable=0</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def analog_modulation(self,enable):
+    &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39; 
+    return self.sendCmd(f&#39;sames {enable}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06MLD.digital_modulation"><code class="name flex">
+<span>def <span class="ident">digital_modulation</span></span>(<span>self, enable)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enable digital modulation mode by enable=1, turn off by enable=0</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def digital_modulation(self,enable):
+    &#39;&#39;&#39;Enable digital modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
+    return self.sendCmd(f&#39;sdmes {enable}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06MLD.get_analog_impedance"><code class="name flex">
+<span>def <span class="ident">get_analog_impedance</span></span>(<span>self, arg)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the impedance of the analog modulation </p>
+<p>return: 0 for HighZ and 1 for 50 Ohm</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_analog_impedance(self,arg):
+    &#39;&#39;&#39;Get the impedance of the analog modulation \n
+    return: 0 for HighZ and 1 for 50 Ohm &#39;&#39;&#39;
+    return self.sendCmd(f&#39;salis {arg}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06MLD.get_modulation_power"><code class="name flex">
+<span>def <span class="ident">get_modulation_power</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>get the modulation power setpoint in mW</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_modulation_power(self):
+    &#39;&#39;&#39;get the modulation power setpoint in mW&#39;&#39;&#39;
+    return float(self.sendCmd(f&#39;glmp?&#39;))</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06MLD.get_modulation_state"><code class="name flex">
+<span>def <span class="ident">get_modulation_state</span></span>(<span>self, type)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>get the laser modulation settings as [analog, digital]</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_modulation_state(self,type):
+    &#39;&#39;&#39;get the laser modulation settings as [analog, digital]&#39;&#39;&#39;
+    dm=self.sendCmd(f&#39;gdmes?&#39;)
+    am=self.sendCmd(f&#39;games?&#39;)
+    return [am,dm]</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06MLD.modulation_mode"><code class="name flex">
+<span>def <span class="ident">modulation_mode</span></span>(<span>self, power=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>enter modulation mode with the possibility
+to set modulation power in mW</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def modulation_mode(self,power=None):
+    &#39;&#39;&#39;enter modulation mode with the possibility  to set modulation power in mW&#39;&#39;&#39;
+    if power!=None:
+        self.sendCmd(f&#39;slmp {power}&#39;)
+    return self.sendCmd(f&#39;em&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06MLD.on_off_modulation"><code class="name flex">
+<span>def <span class="ident">on_off_modulation</span></span>(<span>self, enable)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enable analog modulation mode by enable=1, turn off by enable=0</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def on_off_modulation(self,enable):
+    &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
+    if enable==1:
+        return self.sendCmd(&#39;eoom&#39;)
+    elif enable==0:
+        return self.sendCmd(&#39;xoom&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06MLD.set_analog_impedance"><code class="name flex">
+<span>def <span class="ident">set_analog_impedance</span></span>(<span>self, arg)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the impedance of the analog modulation by </p>
+<p>arg=0 for HighZ and </p>
+<p>arg=1 for 50 Ohm</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_analog_impedance(self,arg):
+    &#39;&#39;&#39;Set the impedance of the analog modulation by \n
+    arg=0 for HighZ and \n
+    arg=1 for 50 Ohm &#39;&#39;&#39;
+    return self.sendCmd(f&#39;salis {arg}&#39;)</code></pre>
+</details>
+</dd>
+<dt id="pycobolt.Cobolt06MLD.set_modulation_power"><code class="name flex">
+<span>def <span class="ident">set_modulation_power</span></span>(<span>self, power)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>set the modulation power in mW</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_modulation_power(self,power):
+    &#39;&#39;&#39;set the modulation power in mW&#39;&#39;&#39;
+    return self.sendCmd(f&#39;slmp {power}&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></b></code>:
+<ul class="hlist">
+<li><code><a title="pycobolt.CoboltLaser.clear_fault" href="#pycobolt.CoboltLaser.clear_fault">clear_fault</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.connect" href="#pycobolt.CoboltLaser.connect">connect</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.constant_current" href="#pycobolt.CoboltLaser.constant_current">constant_current</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.constant_power" href="#pycobolt.CoboltLaser.constant_power">constant_power</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.disconnect" href="#pycobolt.CoboltLaser.disconnect">disconnect</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_current" href="#pycobolt.CoboltLaser.get_current">get_current</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_current_setpoint" href="#pycobolt.CoboltLaser.get_current_setpoint">get_current_setpoint</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_fault" href="#pycobolt.CoboltLaser.get_fault">get_fault</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_mode" href="#pycobolt.CoboltLaser.get_mode">get_mode</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_ophours" href="#pycobolt.CoboltLaser.get_ophours">get_ophours</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_power" href="#pycobolt.CoboltLaser.get_power">get_power</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_power_setpoint" href="#pycobolt.CoboltLaser.get_power_setpoint">get_power_setpoint</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.get_state" href="#pycobolt.CoboltLaser.get_state">get_state</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.interlock" href="#pycobolt.CoboltLaser.interlock">interlock</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.is_connected" href="#pycobolt.CoboltLaser.is_connected">is_connected</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.is_on" href="#pycobolt.CoboltLaser.is_on">is_on</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.send_cmd" href="#pycobolt.CoboltLaser.send_cmd">send_cmd</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.set_current" href="#pycobolt.CoboltLaser.set_current">set_current</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.set_power" href="#pycobolt.CoboltLaser.set_power">set_power</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.turn_off" href="#pycobolt.CoboltLaser.turn_off">turn_off</a></code></li>
+<li><code><a title="pycobolt.CoboltLaser.turn_on" href="#pycobolt.CoboltLaser.turn_on">turn_on</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="pycobolt.CoboltLaser"><code class="flex name class">
 <span>class <span class="ident">CoboltLaser</span></span>
 <span>(</span><span>port=None, serialNumber=None, baudrate=115200)</span>
@@ -699,8 +1179,8 @@ Will automatically return proper subclass, if applicable</p></div>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="pycobolt.Cobolt_06DPL" href="#pycobolt.Cobolt_06DPL">Cobolt_06DPL</a></li>
-<li><a title="pycobolt.Cobolt_06MLD" href="#pycobolt.Cobolt_06MLD">Cobolt_06MLD</a></li>
+<li><a title="pycobolt.Cobolt06DPL" href="#pycobolt.Cobolt06DPL">Cobolt06DPL</a></li>
+<li><a title="pycobolt.Cobolt06MLD" href="#pycobolt.Cobolt06MLD">Cobolt06MLD</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
@@ -1103,486 +1583,6 @@ The string recieved from the laser
 </dd>
 </dl>
 </dd>
-<dt id="pycobolt.Cobolt_06DPL"><code class="flex name class">
-<span>class <span class="ident">Cobolt_06DPL</span></span>
-<span>(</span><span>port=None, serialNumber=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>For lasers of type ModDPL</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class Cobolt_06DPL(CoboltLaser):
-    &#39;&#39;&#39;For lasers of type ModDPL&#39;&#39;&#39;
-    def __init__(self,port=None,serialNumber=None):
-        super().__init__(port,serialNumber)
-
-    def modulation_mode(self,highI=None):
-        &#39;&#39;&#39;Enter Modulation mode, with possibiity to set the modulation high current level in mA (**kwarg)&#39;&#39;&#39;
-        if highI!=None:
-            self.sendCmd(f&#39;smc {highI}&#39;)
-        return self.sendCmd(f&#39;em&#39;)
-
-    def digital_modulation(self,enable):
-        &#39;&#39;&#39;Enable digital modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
-        return self.sendCmd(f&#39;sdmes {enable}&#39;)
-
-    def analog_modulation(self,enable):
-        &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39; 
-        return self.sendCmd(f&#39;sames {enable}&#39;)
-
-    def get_modulation_state(self):
-        &#39;&#39;&#39;get the laser modulation settings as [analog, digital]&#39;&#39;&#39;
-        dm=self.sendCmd(f&#39;gdmes?&#39;)
-        am=self.sendCmd(f&#39;games?&#39;)
-        return [am,dm]
-
-    def set_modulation_current_high(self,highI):
-        &#39;&#39;&#39;Set the modulation high current in mA &#39;&#39;&#39;
-        return self.sendCmd(f&#39;smc {highI}&#39;)
-    
-    def set_modulation_current_low(self,lowI):
-        &#39;&#39;&#39;Set the modulation low current in mA &#39;&#39;&#39;
-        return self.sendCmd(f&#39;slth {highI}&#39;)
-    
-    def get_modulation_current(self):
-        &#39;&#39;&#39;Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]&#39;&#39;&#39;
-        highI=float(self.sendCmd(f&#39;gmc?&#39;))
-        lowI=float(self.sendCmd(f&#39;glth?&#39;))
-        return [highI,lowI] 
-
-    def get_modulation_tec(self):
-        &#39;&#39;&#39;Read the temperature of the modulation TEC in °C&#39;&#39;&#39;
-        return float(self.sendCmd(f&#39;rtec4t?&#39;))
-
-    def set_modulation_tec(self, temperature):
-        &#39;&#39;&#39;Set the temperature of the modulation TEC in °C&#39;&#39;&#39;
-        return self.sendCmd(f&#39;stec4t {temperature}&#39;)
-
-    def get_modualtion_tec_setpoint(self):
-        &#39;&#39;&#39;Get the setpoint of the modulation TEC in °C&#39;&#39;&#39;
-        return float(self.sendCmd(f&#39;gtec4t?&#39;))</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></li>
-</ul>
-<h3>Methods</h3>
-<dl>
-<dt id="pycobolt.Cobolt_06DPL.analog_modulation"><code class="name flex">
-<span>def <span class="ident">analog_modulation</span></span>(<span>self, enable)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Enable analog modulation mode by enable=1, turn off by enable=0</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def analog_modulation(self,enable):
-    &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39; 
-    return self.sendCmd(f&#39;sames {enable}&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.digital_modulation"><code class="name flex">
-<span>def <span class="ident">digital_modulation</span></span>(<span>self, enable)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Enable digital modulation mode by enable=1, turn off by enable=0</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def digital_modulation(self,enable):
-    &#39;&#39;&#39;Enable digital modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
-    return self.sendCmd(f&#39;sdmes {enable}&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.get_modualtion_tec_setpoint"><code class="name flex">
-<span>def <span class="ident">get_modualtion_tec_setpoint</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Get the setpoint of the modulation TEC in °C</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_modualtion_tec_setpoint(self):
-    &#39;&#39;&#39;Get the setpoint of the modulation TEC in °C&#39;&#39;&#39;
-    return float(self.sendCmd(f&#39;gtec4t?&#39;))</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.get_modulation_current"><code class="name flex">
-<span>def <span class="ident">get_modulation_current</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_modulation_current(self):
-    &#39;&#39;&#39;Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]&#39;&#39;&#39;
-    highI=float(self.sendCmd(f&#39;gmc?&#39;))
-    lowI=float(self.sendCmd(f&#39;glth?&#39;))
-    return [highI,lowI] </code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.get_modulation_state"><code class="name flex">
-<span>def <span class="ident">get_modulation_state</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>get the laser modulation settings as [analog, digital]</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_modulation_state(self):
-    &#39;&#39;&#39;get the laser modulation settings as [analog, digital]&#39;&#39;&#39;
-    dm=self.sendCmd(f&#39;gdmes?&#39;)
-    am=self.sendCmd(f&#39;games?&#39;)
-    return [am,dm]</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.get_modulation_tec"><code class="name flex">
-<span>def <span class="ident">get_modulation_tec</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Read the temperature of the modulation TEC in °C</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_modulation_tec(self):
-    &#39;&#39;&#39;Read the temperature of the modulation TEC in °C&#39;&#39;&#39;
-    return float(self.sendCmd(f&#39;rtec4t?&#39;))</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.modulation_mode"><code class="name flex">
-<span>def <span class="ident">modulation_mode</span></span>(<span>self, highI=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Enter Modulation mode, with possibiity to set the modulation high current level in mA (**kwarg)</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def modulation_mode(self,highI=None):
-    &#39;&#39;&#39;Enter Modulation mode, with possibiity to set the modulation high current level in mA (**kwarg)&#39;&#39;&#39;
-    if highI!=None:
-        self.sendCmd(f&#39;smc {highI}&#39;)
-    return self.sendCmd(f&#39;em&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.set_modulation_current_high"><code class="name flex">
-<span>def <span class="ident">set_modulation_current_high</span></span>(<span>self, highI)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Set the modulation high current in mA</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_modulation_current_high(self,highI):
-    &#39;&#39;&#39;Set the modulation high current in mA &#39;&#39;&#39;
-    return self.sendCmd(f&#39;smc {highI}&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.set_modulation_current_low"><code class="name flex">
-<span>def <span class="ident">set_modulation_current_low</span></span>(<span>self, lowI)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Set the modulation low current in mA</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_modulation_current_low(self,lowI):
-    &#39;&#39;&#39;Set the modulation low current in mA &#39;&#39;&#39;
-    return self.sendCmd(f&#39;slth {highI}&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06DPL.set_modulation_tec"><code class="name flex">
-<span>def <span class="ident">set_modulation_tec</span></span>(<span>self, temperature)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Set the temperature of the modulation TEC in °C</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_modulation_tec(self, temperature):
-    &#39;&#39;&#39;Set the temperature of the modulation TEC in °C&#39;&#39;&#39;
-    return self.sendCmd(f&#39;stec4t {temperature}&#39;)</code></pre>
-</details>
-</dd>
-</dl>
-<h3>Inherited members</h3>
-<ul class="hlist">
-<li><code><b><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></b></code>:
-<ul class="hlist">
-<li><code><a title="pycobolt.CoboltLaser.clear_fault" href="#pycobolt.CoboltLaser.clear_fault">clear_fault</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.connect" href="#pycobolt.CoboltLaser.connect">connect</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.constant_current" href="#pycobolt.CoboltLaser.constant_current">constant_current</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.constant_power" href="#pycobolt.CoboltLaser.constant_power">constant_power</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.disconnect" href="#pycobolt.CoboltLaser.disconnect">disconnect</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_current" href="#pycobolt.CoboltLaser.get_current">get_current</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_current_setpoint" href="#pycobolt.CoboltLaser.get_current_setpoint">get_current_setpoint</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_fault" href="#pycobolt.CoboltLaser.get_fault">get_fault</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_mode" href="#pycobolt.CoboltLaser.get_mode">get_mode</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_ophours" href="#pycobolt.CoboltLaser.get_ophours">get_ophours</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_power" href="#pycobolt.CoboltLaser.get_power">get_power</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_power_setpoint" href="#pycobolt.CoboltLaser.get_power_setpoint">get_power_setpoint</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_state" href="#pycobolt.CoboltLaser.get_state">get_state</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.interlock" href="#pycobolt.CoboltLaser.interlock">interlock</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.is_connected" href="#pycobolt.CoboltLaser.is_connected">is_connected</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.is_on" href="#pycobolt.CoboltLaser.is_on">is_on</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.send_cmd" href="#pycobolt.CoboltLaser.send_cmd">send_cmd</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.set_current" href="#pycobolt.CoboltLaser.set_current">set_current</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.set_power" href="#pycobolt.CoboltLaser.set_power">set_power</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.turn_off" href="#pycobolt.CoboltLaser.turn_off">turn_off</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.turn_on" href="#pycobolt.CoboltLaser.turn_on">turn_on</a></code></li>
-</ul>
-</li>
-</ul>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD"><code class="flex name class">
-<span>class <span class="ident">Cobolt_06MLD</span></span>
-<span>(</span><span>port=None, serialNumber=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>For lasers of type MLD</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class Cobolt_06MLD(CoboltLaser):
-    &#39;&#39;&#39;For lasers of type MLD&#39;&#39;&#39;
-    def __init__(self,port=None,serialNumber=None):
-        super().__init__(port,serialNumber)
-
-    def modulation_mode(self,power=None):
-        &#39;&#39;&#39;enter modulation mode with the possibility  to set modulation power in mW&#39;&#39;&#39;
-        if power!=None:
-            self.sendCmd(f&#39;slmp {power}&#39;)
-        return self.sendCmd(f&#39;em&#39;)
-
-    def digital_modulation(self,enable):
-        &#39;&#39;&#39;Enable digital modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
-        return self.sendCmd(f&#39;sdmes {enable}&#39;)
-
-    def analog_modulation(self,enable):
-        &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39; 
-        return self.sendCmd(f&#39;sames {enable}&#39;)
-    
-    def on_off_modulation(self,enable):
-        &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
-        if enable==1:
-            return self.sendCmd(&#39;eoom&#39;)
-        elif enable==0:
-            return self.sendCmd(&#39;xoom&#39;)
-
-    def get_modulation_state(self,type):
-        &#39;&#39;&#39;get the laser modulation settings as [analog, digital]&#39;&#39;&#39;
-        dm=self.sendCmd(f&#39;gdmes?&#39;)
-        am=self.sendCmd(f&#39;games?&#39;)
-        return [am,dm]
-
-    def set_modulation_power(self,power):
-        &#39;&#39;&#39;set the modulation power in mW&#39;&#39;&#39;
-        return self.sendCmd(f&#39;slmp {power}&#39;)
-    
-    def get_modulation_power(self):
-        &#39;&#39;&#39;get the modulation power setpoint in mW&#39;&#39;&#39;
-        return float(self.sendCmd(f&#39;glmp?&#39;))
-
-    def set_analog_impedance(self,arg):
-        &#39;&#39;&#39;Set the impedance of the analog modulation by \n
-        arg=0 for HighZ and \n
-        arg=1 for 50 Ohm &#39;&#39;&#39;
-        return self.sendCmd(f&#39;salis {arg}&#39;)
-        
-    def get_analog_impedance(self,arg):
-        &#39;&#39;&#39;Get the impedance of the analog modulation \n
-        return: 0 for HighZ and 1 for 50 Ohm &#39;&#39;&#39;
-        return self.sendCmd(f&#39;salis {arg}&#39;)</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></li>
-</ul>
-<h3>Methods</h3>
-<dl>
-<dt id="pycobolt.Cobolt_06MLD.analog_modulation"><code class="name flex">
-<span>def <span class="ident">analog_modulation</span></span>(<span>self, enable)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Enable analog modulation mode by enable=1, turn off by enable=0</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def analog_modulation(self,enable):
-    &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39; 
-    return self.sendCmd(f&#39;sames {enable}&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD.digital_modulation"><code class="name flex">
-<span>def <span class="ident">digital_modulation</span></span>(<span>self, enable)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Enable digital modulation mode by enable=1, turn off by enable=0</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def digital_modulation(self,enable):
-    &#39;&#39;&#39;Enable digital modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
-    return self.sendCmd(f&#39;sdmes {enable}&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD.get_analog_impedance"><code class="name flex">
-<span>def <span class="ident">get_analog_impedance</span></span>(<span>self, arg)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Get the impedance of the analog modulation </p>
-<p>return: 0 for HighZ and 1 for 50 Ohm</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_analog_impedance(self,arg):
-    &#39;&#39;&#39;Get the impedance of the analog modulation \n
-    return: 0 for HighZ and 1 for 50 Ohm &#39;&#39;&#39;
-    return self.sendCmd(f&#39;salis {arg}&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD.get_modulation_power"><code class="name flex">
-<span>def <span class="ident">get_modulation_power</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>get the modulation power setpoint in mW</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_modulation_power(self):
-    &#39;&#39;&#39;get the modulation power setpoint in mW&#39;&#39;&#39;
-    return float(self.sendCmd(f&#39;glmp?&#39;))</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD.get_modulation_state"><code class="name flex">
-<span>def <span class="ident">get_modulation_state</span></span>(<span>self, type)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>get the laser modulation settings as [analog, digital]</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_modulation_state(self,type):
-    &#39;&#39;&#39;get the laser modulation settings as [analog, digital]&#39;&#39;&#39;
-    dm=self.sendCmd(f&#39;gdmes?&#39;)
-    am=self.sendCmd(f&#39;games?&#39;)
-    return [am,dm]</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD.modulation_mode"><code class="name flex">
-<span>def <span class="ident">modulation_mode</span></span>(<span>self, power=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>enter modulation mode with the possibility
-to set modulation power in mW</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def modulation_mode(self,power=None):
-    &#39;&#39;&#39;enter modulation mode with the possibility  to set modulation power in mW&#39;&#39;&#39;
-    if power!=None:
-        self.sendCmd(f&#39;slmp {power}&#39;)
-    return self.sendCmd(f&#39;em&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD.on_off_modulation"><code class="name flex">
-<span>def <span class="ident">on_off_modulation</span></span>(<span>self, enable)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Enable analog modulation mode by enable=1, turn off by enable=0</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def on_off_modulation(self,enable):
-    &#39;&#39;&#39;Enable analog modulation mode by enable=1, turn off by enable=0&#39;&#39;&#39;
-    if enable==1:
-        return self.sendCmd(&#39;eoom&#39;)
-    elif enable==0:
-        return self.sendCmd(&#39;xoom&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD.set_analog_impedance"><code class="name flex">
-<span>def <span class="ident">set_analog_impedance</span></span>(<span>self, arg)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Set the impedance of the analog modulation by </p>
-<p>arg=0 for HighZ and </p>
-<p>arg=1 for 50 Ohm</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_analog_impedance(self,arg):
-    &#39;&#39;&#39;Set the impedance of the analog modulation by \n
-    arg=0 for HighZ and \n
-    arg=1 for 50 Ohm &#39;&#39;&#39;
-    return self.sendCmd(f&#39;salis {arg}&#39;)</code></pre>
-</details>
-</dd>
-<dt id="pycobolt.Cobolt_06MLD.set_modulation_power"><code class="name flex">
-<span>def <span class="ident">set_modulation_power</span></span>(<span>self, power)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>set the modulation power in mW</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_modulation_power(self,power):
-    &#39;&#39;&#39;set the modulation power in mW&#39;&#39;&#39;
-    return self.sendCmd(f&#39;slmp {power}&#39;)</code></pre>
-</details>
-</dd>
-</dl>
-<h3>Inherited members</h3>
-<ul class="hlist">
-<li><code><b><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></b></code>:
-<ul class="hlist">
-<li><code><a title="pycobolt.CoboltLaser.clear_fault" href="#pycobolt.CoboltLaser.clear_fault">clear_fault</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.connect" href="#pycobolt.CoboltLaser.connect">connect</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.constant_current" href="#pycobolt.CoboltLaser.constant_current">constant_current</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.constant_power" href="#pycobolt.CoboltLaser.constant_power">constant_power</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.disconnect" href="#pycobolt.CoboltLaser.disconnect">disconnect</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_current" href="#pycobolt.CoboltLaser.get_current">get_current</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_current_setpoint" href="#pycobolt.CoboltLaser.get_current_setpoint">get_current_setpoint</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_fault" href="#pycobolt.CoboltLaser.get_fault">get_fault</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_mode" href="#pycobolt.CoboltLaser.get_mode">get_mode</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_ophours" href="#pycobolt.CoboltLaser.get_ophours">get_ophours</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_power" href="#pycobolt.CoboltLaser.get_power">get_power</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_power_setpoint" href="#pycobolt.CoboltLaser.get_power_setpoint">get_power_setpoint</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.get_state" href="#pycobolt.CoboltLaser.get_state">get_state</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.interlock" href="#pycobolt.CoboltLaser.interlock">interlock</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.is_connected" href="#pycobolt.CoboltLaser.is_connected">is_connected</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.is_on" href="#pycobolt.CoboltLaser.is_on">is_on</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.send_cmd" href="#pycobolt.CoboltLaser.send_cmd">send_cmd</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.set_current" href="#pycobolt.CoboltLaser.set_current">set_current</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.set_power" href="#pycobolt.CoboltLaser.set_power">set_power</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.turn_off" href="#pycobolt.CoboltLaser.turn_off">turn_off</a></code></li>
-<li><code><a title="pycobolt.CoboltLaser.turn_on" href="#pycobolt.CoboltLaser.turn_on">turn_on</a></code></li>
-</ul>
-</li>
-</ul>
-</dd>
 </dl>
 </section>
 </article>
@@ -1599,6 +1599,35 @@ to set modulation power in mW</p></div>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="pycobolt.Cobolt06DPL" href="#pycobolt.Cobolt06DPL">Cobolt06DPL</a></code></h4>
+<ul class="">
+<li><code><a title="pycobolt.Cobolt06DPL.analog_modulation" href="#pycobolt.Cobolt06DPL.analog_modulation">analog_modulation</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.digital_modulation" href="#pycobolt.Cobolt06DPL.digital_modulation">digital_modulation</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.get_modualtion_tec_setpoint" href="#pycobolt.Cobolt06DPL.get_modualtion_tec_setpoint">get_modualtion_tec_setpoint</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.get_modulation_current" href="#pycobolt.Cobolt06DPL.get_modulation_current">get_modulation_current</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.get_modulation_state" href="#pycobolt.Cobolt06DPL.get_modulation_state">get_modulation_state</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.get_modulation_tec" href="#pycobolt.Cobolt06DPL.get_modulation_tec">get_modulation_tec</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.modulation_mode" href="#pycobolt.Cobolt06DPL.modulation_mode">modulation_mode</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.set_modulation_current_high" href="#pycobolt.Cobolt06DPL.set_modulation_current_high">set_modulation_current_high</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.set_modulation_current_low" href="#pycobolt.Cobolt06DPL.set_modulation_current_low">set_modulation_current_low</a></code></li>
+<li><code><a title="pycobolt.Cobolt06DPL.set_modulation_tec" href="#pycobolt.Cobolt06DPL.set_modulation_tec">set_modulation_tec</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pycobolt.Cobolt06MLD" href="#pycobolt.Cobolt06MLD">Cobolt06MLD</a></code></h4>
+<ul class="">
+<li><code><a title="pycobolt.Cobolt06MLD.analog_modulation" href="#pycobolt.Cobolt06MLD.analog_modulation">analog_modulation</a></code></li>
+<li><code><a title="pycobolt.Cobolt06MLD.digital_modulation" href="#pycobolt.Cobolt06MLD.digital_modulation">digital_modulation</a></code></li>
+<li><code><a title="pycobolt.Cobolt06MLD.get_analog_impedance" href="#pycobolt.Cobolt06MLD.get_analog_impedance">get_analog_impedance</a></code></li>
+<li><code><a title="pycobolt.Cobolt06MLD.get_modulation_power" href="#pycobolt.Cobolt06MLD.get_modulation_power">get_modulation_power</a></code></li>
+<li><code><a title="pycobolt.Cobolt06MLD.get_modulation_state" href="#pycobolt.Cobolt06MLD.get_modulation_state">get_modulation_state</a></code></li>
+<li><code><a title="pycobolt.Cobolt06MLD.modulation_mode" href="#pycobolt.Cobolt06MLD.modulation_mode">modulation_mode</a></code></li>
+<li><code><a title="pycobolt.Cobolt06MLD.on_off_modulation" href="#pycobolt.Cobolt06MLD.on_off_modulation">on_off_modulation</a></code></li>
+<li><code><a title="pycobolt.Cobolt06MLD.set_analog_impedance" href="#pycobolt.Cobolt06MLD.set_analog_impedance">set_analog_impedance</a></code></li>
+<li><code><a title="pycobolt.Cobolt06MLD.set_modulation_power" href="#pycobolt.Cobolt06MLD.set_modulation_power">set_modulation_power</a></code></li>
+</ul>
+</li>
 <li>
 <h4><code><a title="pycobolt.CoboltLaser" href="#pycobolt.CoboltLaser">CoboltLaser</a></code></h4>
 <ul class="">
@@ -1623,35 +1652,6 @@ to set modulation power in mW</p></div>
 <li><code><a title="pycobolt.CoboltLaser.set_power" href="#pycobolt.CoboltLaser.set_power">set_power</a></code></li>
 <li><code><a title="pycobolt.CoboltLaser.turn_off" href="#pycobolt.CoboltLaser.turn_off">turn_off</a></code></li>
 <li><code><a title="pycobolt.CoboltLaser.turn_on" href="#pycobolt.CoboltLaser.turn_on">turn_on</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="pycobolt.Cobolt_06DPL" href="#pycobolt.Cobolt_06DPL">Cobolt_06DPL</a></code></h4>
-<ul class="">
-<li><code><a title="pycobolt.Cobolt_06DPL.analog_modulation" href="#pycobolt.Cobolt_06DPL.analog_modulation">analog_modulation</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.digital_modulation" href="#pycobolt.Cobolt_06DPL.digital_modulation">digital_modulation</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.get_modualtion_tec_setpoint" href="#pycobolt.Cobolt_06DPL.get_modualtion_tec_setpoint">get_modualtion_tec_setpoint</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.get_modulation_current" href="#pycobolt.Cobolt_06DPL.get_modulation_current">get_modulation_current</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.get_modulation_state" href="#pycobolt.Cobolt_06DPL.get_modulation_state">get_modulation_state</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.get_modulation_tec" href="#pycobolt.Cobolt_06DPL.get_modulation_tec">get_modulation_tec</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.modulation_mode" href="#pycobolt.Cobolt_06DPL.modulation_mode">modulation_mode</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.set_modulation_current_high" href="#pycobolt.Cobolt_06DPL.set_modulation_current_high">set_modulation_current_high</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.set_modulation_current_low" href="#pycobolt.Cobolt_06DPL.set_modulation_current_low">set_modulation_current_low</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06DPL.set_modulation_tec" href="#pycobolt.Cobolt_06DPL.set_modulation_tec">set_modulation_tec</a></code></li>
-</ul>
-</li>
-<li>
-<h4><code><a title="pycobolt.Cobolt_06MLD" href="#pycobolt.Cobolt_06MLD">Cobolt_06MLD</a></code></h4>
-<ul class="">
-<li><code><a title="pycobolt.Cobolt_06MLD.analog_modulation" href="#pycobolt.Cobolt_06MLD.analog_modulation">analog_modulation</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06MLD.digital_modulation" href="#pycobolt.Cobolt_06MLD.digital_modulation">digital_modulation</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06MLD.get_analog_impedance" href="#pycobolt.Cobolt_06MLD.get_analog_impedance">get_analog_impedance</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06MLD.get_modulation_power" href="#pycobolt.Cobolt_06MLD.get_modulation_power">get_modulation_power</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06MLD.get_modulation_state" href="#pycobolt.Cobolt_06MLD.get_modulation_state">get_modulation_state</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06MLD.modulation_mode" href="#pycobolt.Cobolt_06MLD.modulation_mode">modulation_mode</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06MLD.on_off_modulation" href="#pycobolt.Cobolt_06MLD.on_off_modulation">on_off_modulation</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06MLD.set_analog_impedance" href="#pycobolt.Cobolt_06MLD.set_analog_impedance">set_analog_impedance</a></code></li>
-<li><code><a title="pycobolt.Cobolt_06MLD.set_modulation_power" href="#pycobolt.Cobolt_06MLD.set_modulation_power">set_modulation_power</a></code></li>
 </ul>
 </li>
 </ul>

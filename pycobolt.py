@@ -251,8 +251,8 @@ class CoboltLaser():
         return "Syntax Error: No response"
 
 
-class Cobolt_06MLD(CoboltLaser):
-    '''For lasers of type MLD'''
+class Cobolt06MLD(CoboltLaser):
+    '''For lasers of type 06-MLD'''
     def __init__(self,port=None,serialNumber=None):
         super().__init__(port,serialNumber)
 
@@ -304,8 +304,8 @@ class Cobolt_06MLD(CoboltLaser):
         
 
 
-class Cobolt_06DPL(CoboltLaser):
-    '''For lasers of type ModDPL'''
+class Cobolt06DPL(CoboltLaser):
+    '''For lasers of type 06-DPL'''
     def __init__(self,port=None,serialNumber=None):
         super().__init__(port,serialNumber)
 
