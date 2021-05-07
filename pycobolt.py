@@ -80,9 +80,9 @@ class CoboltLaser():
         try:
             if '-06-' in self.modelNumber:
                 if '532' in self.modelNumber[0:4] or '561' in self.modelNumber[0:4] or '553' in self.modelNumber[0:4]:
-                    self.__class__=CoboltModDPL
+                    self.__class__=Cobolt_06DPL
                 else:
-                    self.__class__=CoboltMLD
+                    self.__class__=Cobolt_06MLD
         except:
             pass
     
