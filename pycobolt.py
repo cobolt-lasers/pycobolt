@@ -86,7 +86,7 @@ class CoboltLaser():
         except:
             pass
     
-    def isConnected(self): 
+    def is_connected(self): 
         """Ask if laser is connected"""
         if self.adress.is_open:
             try:
@@ -106,18 +106,17 @@ class CoboltLaser():
             self.adress.close()
             self.serialNumber=None
             self.modelNumber=None
-
          
-    def turnOn(self):
+    def turn_on(self):
         '''turn on the laser with the autostart sequence.The laser will await the TEC setpoints and pass a warm-up state'''
         return self.sendCmd(f'@cob1') 
 
 
-    def turnOff(self):
+    def turn_off(self):
         '''turn off the laser '''
         return self.sendCmd(f'l0') 
         
-    def isOn(self):
+    def is_on(self):
         '''Check if laser is turned on '''
         answer=self.sendCmd(f'l?') 
         if answer == '1':
@@ -129,37 +128,28 @@ class CoboltLaser():
         '''Returns: 0 if closed, 1 if open '''
         return self.sendCmd(f'ilk?')
 
-    def getFault(self):
+    def get_fault(self):
         '''Get laser fault'''
         faults={'0': '0 - No errors',
         '1':'1 – Temperature error',
         '3':'3 - Interlock error',
         '4':'4 – Constant power time out'}
         fault=self.sendCmd(f'f?')
-        try:
-            fault=faults.get(fault)
-            return fault
-        except:
-            return fault
+        return faults.get(fault,fault)
 
-
-    def clearFault(self):
+    def clear_fault(self):
         '''Clear laser fault'''
         return self.sendCmd(f'cf')
     
-    def getMode(self):
+    def get_mode(self):
         '''get operating mode'''
         modes={'0': '0 - Constant Current',
         '1': '1 - Constant Power',
         '2':'2 - Modulation Mode'}
         mode=self.sendCmd(f'gam?')
-        try: 
-            mode=modes.get(mode)
-            return modes.get(mode)
-        except:
-            return mode
+        return modes.get(mode,mode)
 
-    def getState(self): 
+    def get_state(self): 
         '''get autostart state'''
         states={'0':'0–Off',
         '1':'1 – Waiting for key',
@@ -169,58 +159,51 @@ class CoboltLaser():
         '5':'5 – Fault',
         '6':'6 – Aborted'}
         state=self.sendCmd(f'gom?')
-        try:
-            state=states.get(state)
-            return state
-        except:
-            return state
+        return states.get(state,state)
+   
 
-        
-
-
-
-    def constCurrent(self,current=None):
+    def constant_current(self,current=None):
         '''Enter constant current mode, current in mA ''' 
         if current!=None:
             self.sendCmd(f'slc {current}')
         return self.sendCmd(f'ci')
 
-    def setCurrent(self, current):
+    def set_current(self, current):
         '''Set laser current in mA'''
         return self.sendCmd(f'slc {current}')
 
     
-    def getCurrent(self):
+    def get_current(self):
         '''Get laser current in mA '''
         return float(self.sendCmd(f'i?')) #returns mA
 
 
-    def getCurrentSetpoint(self):
-        '''Get laser current in mA '''
+    def get_current_setpoint(self):
+        '''Get laser current setpoint in mA '''
         return float(self.sendCmd(f'glc?')) #returns mA
 
 
 
-    def constPower(self,power=None):
+    def constant_power(self,power=None):
         '''Enter constant power mode, power in mW''' 
         if power!=None:
             self.sendCmd(f'p {float(power)/1000}')
         return self.sendCmd(f'cp')
     
-    def setPower(self, power):
+    def set_power(self, power):
         '''Set laser power in mW '''
         return self.sendCmd(f'p {float(power)/1000}')
 
-    def getPower(self):
+    def get_power(self):
         ''' Get laser power in mW'''
         return float(self.sendCmd(f'pa?'))*1000    
 
-    def getPowerSetpoint(self):
+    def get_power_setpoint(self):
         ''' Get laser power setpoint in mW'''
         return float(self.sendCmd(f'p?'))*1000    
 
 
-    def getOpHours(self):
+    def get_ophours(self):
         ''' Get laser operational hours'''
         return self.sendCmd(f'hrs?')
 
@@ -230,7 +213,7 @@ class CoboltLaser():
         return time_diff
 
 
-    def sendCmd( self, message, timeout = 1000 ):
+    def send_cmd( self, message, timeout = 1000 ):
         """ Sends a message to the laset and awaits response until timeout (ms).
 
             :returns:
@@ -268,107 +251,114 @@ class CoboltLaser():
         return "Syntax Error: No response"
 
 
-class CoboltMLD(CoboltLaser):
+class Cobolt_06MLD(CoboltLaser):
     '''For lasers of type MLD'''
     def __init__(self,port=None,serialNumber=None):
         super().__init__(port,serialNumber)
 
-    def modulationMode(self,power=None):
+    def modulation_mode(self,power=None):
         '''enter modulation mode with the possibility  to set modulation power in mW'''
         if power!=None:
             self.sendCmd(f'slmp {power}')
         return self.sendCmd(f'em')
 
-    def digitalModulation(self,enable):
+    def digital_modulation(self,enable):
         '''Enable digital modulation mode by enable=1, turn off by enable=0'''
         return self.sendCmd(f'sdmes {enable}')
 
-    def analogModulation(self,enable):
+    def analog_modulation(self,enable):
         '''Enable analog modulation mode by enable=1, turn off by enable=0''' 
         return self.sendCmd(f'sames {enable}')
+    
+    def on_off_modulation(self,enable):
+        '''Enable analog modulation mode by enable=1, turn off by enable=0'''
+        if enable==1:
+            return self.sendCmd('eoom')
+        elif enable==0:
+            return self.sendCmd('xoom')
 
-    def getModulationState(self,type):
+    def get_modulation_state(self,type):
         '''get the laser modulation settings as [analog, digital]'''
         dm=self.sendCmd(f'gdmes?')
         am=self.sendCmd(f'games?')
         return [am,dm]
 
-    def setModulationPower(self,power):
+    def set_modulation_power(self,power):
         '''set the modulation power in mW'''
         return self.sendCmd(f'slmp {power}')
     
-    def getModulationPower(self):
+    def get_modulation_power(self):
         '''get the modulation power setpoint in mW'''
         return float(self.sendCmd(f'glmp?'))
 
-    def setAnalogImpedance(self,arg):
+    def set_analog_impedance(self,arg):
         '''Set the impedance of the analog modulation by \n
         arg=0 for HighZ and \n
         arg=1 for 50 Ohm '''
         return self.sendCmd(f'salis {arg}')
         
-    def getAnalogImpedance(self,arg):
+    def get_analog_impedance(self,arg):
         '''Get the impedance of the analog modulation \n
         return: 0 for HighZ and 1 for 50 Ohm '''
         return self.sendCmd(f'salis {arg}')
         
 
 
-class CoboltModDPL(CoboltLaser):
+class Cobolt_06DPL(CoboltLaser):
     '''For lasers of type ModDPL'''
     def __init__(self,port=None,serialNumber=None):
         super().__init__(port,serialNumber)
 
-    def modulationMode(self,highI=None):
+    def modulation_mode(self,highI=None):
         '''Enter Modulation mode, with possibiity to set the modulation high current level in mA (**kwarg)'''
         if highI!=None:
             self.sendCmd(f'smc {highI}')
         return self.sendCmd(f'em')
 
-    def digitalModulation(self,enable):
+    def digital_modulation(self,enable):
         '''Enable digital modulation mode by enable=1, turn off by enable=0'''
         return self.sendCmd(f'sdmes {enable}')
 
-    def analogModulation(self,enable):
+    def analog_modulation(self,enable):
         '''Enable analog modulation mode by enable=1, turn off by enable=0''' 
         return self.sendCmd(f'sames {enable}')
 
-    def getModulationState(self):
+    def get_modulation_state(self):
         '''get the laser modulation settings as [analog, digital]'''
         dm=self.sendCmd(f'gdmes?')
         am=self.sendCmd(f'games?')
         return [am,dm]
 
-    def setModCurrentHigh(self,highI):
+    def set_modulation_current_high(self,highI):
         '''Set the modulation high current in mA '''
         return self.sendCmd(f'smc {highI}')
     
-    def setModCurrentLow(self,lowI):
+    def set_modulation_current_low(self,lowI):
         '''Set the modulation low current in mA '''
         return self.sendCmd(f'slth {highI}')
     
-    def getModCurrent(self):
+    def get_modulation_current(self):
         '''Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]'''
         highI=float(self.sendCmd(f'gmc?'))
         lowI=float(self.sendCmd(f'glth?'))
         return [highI,lowI] 
 
-    def getModTec(self):
+    def get_modulation_tec(self):
         '''Read the temperature of the modulation TEC in °C'''
         return float(self.sendCmd(f'rtec4t?'))
 
-    def setModTec(self, temperature):
+    def set_modulation_tec(self, temperature):
         '''Set the temperature of the modulation TEC in °C'''
         return self.sendCmd(f'stec4t {temperature}')
 
-    def getModTecSetpoint(self):
+    def get_modualtion_tec_setpoint(self):
         '''Get the setpoint of the modulation TEC in °C'''
         return float(self.sendCmd(f'gtec4t?'))
 
 
 
 
-def listLasers():
+def list_lasers():
     '''Return a list of laser objects for all cobolt lasers connected to the computer '''
     lasers=[]
     ports=list_ports.comports()
