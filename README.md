@@ -1,7 +1,7 @@
 # pycobolt
 
-#### SDK for system integration of Cobolt Lasers
-This is a package to facilitate system integration of Cobolt Lasers in Python. Connect to your Cobolt Laser using either its serial number or the associated COM-port. 
+#### Official python package for Cobolt Lasers
+This is a package to facilitate system integration of Cobolt Lasers in Python. Connect to your Cobolt Laser using either the serial number or COM-port of the laser. 
 
 
 #### Dependencies
