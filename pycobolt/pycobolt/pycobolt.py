@@ -65,7 +65,7 @@ class CoboltLaser():
             self.serialnumber = self.send_cmd('sn?') 
             if not '.' in firmware: 
                 if '0' in self.serialnumber: 
-                    self.modelnumber=f'0{self.serialnumber.partition(string(0))[0]}-04-XX-XXXX-XXX'
+                    self.modelnumber=f'0{self.serialnumber.partition(str(0))[0]}-04-XX-XXXX-XXX'
                     self.serialnumber=self.serialnumber.partition('0')[2] 
                     while self.serialnumber[0]=='0':
                         self.serialnumber=self.serialnumber[1:]                   
@@ -335,7 +335,7 @@ class Cobolt06DPL(CoboltLaser):
     
     def set_modulation_current_low(self,lowI):
         '''Set the modulation low current in mA '''
-        return self.send_cmd(f'slth {highI}')
+        return self.send_cmd(f'slth {lowI}')
     
     def get_modulation_current(self):
         '''Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]'''
