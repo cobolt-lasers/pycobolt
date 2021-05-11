@@ -1,3 +1,3 @@
 # pycobolt
 
-A CoboltLaser package for for customer use
+SDK for system integration of Cobolt Lasers

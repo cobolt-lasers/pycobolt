@@ -1,15 +1,3 @@
-[tool.poetry]
-name = "pycobolt"
-version = "0.1.0"
-description = ""
-authors = ["Charlotte Liljestrand <chalil@cobolt.se>"]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
