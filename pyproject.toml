@@ -8,8 +8,3 @@ author = "Cobolt Lasers"
 home-page = "https://hubner-photonics.com"
 classifiers = [ "License :: OSI Approved :: MIT License",]
 description-file = "README.md"
-
-[project]
-dependencies = [
-    pyserial >= 3.5
-]
