@@ -1,12 +1,11 @@
 # pycobolt
-
 ## Official python package for Cobolt Lasers
 This is a package to facilitate system integration of Cobolt Lasers in Python. Connect to your Cobolt Laser using either the serial number or COM-port of the laser. 
 
-## Dependencies
+
 [Setuptools](https://pypi.org/project/setuptools/) used for build process.
 
-The package requires [Pyserial](https://pypi.org/project/pyserial/) and Python 3.
+
 
 ## Build and Installation
 ```
