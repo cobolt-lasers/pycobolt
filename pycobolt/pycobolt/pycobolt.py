@@ -277,7 +277,7 @@ class Cobolt06MLD(CoboltLaser):
         elif enable==0:
             return self.send_cmd('xoom')
 
-    def get_modulation_state(self,type):
+    def get_modulation_state(self):
         '''Get the laser modulation settings as [analog, digital]'''
         dm=self.send_cmd(f'gdmes?')
         am=self.send_cmd(f'games?')
@@ -297,10 +297,10 @@ class Cobolt06MLD(CoboltLaser):
         arg=1 for 50 Ohm '''
         return self.send_cmd(f'salis {arg}')
         
-    def get_analog_impedance(self,arg):
+    def get_analog_impedance(self):
         '''Get the impedance of the analog modulation \n
         return: 0 for HighZ and 1 for 50 Ohm '''
-        return self.send_cmd(f'salis {arg}')
+        return self.send_cmd(f'galis?')
         
 
 
