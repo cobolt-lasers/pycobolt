@@ -79,7 +79,7 @@ class CoboltLaser():
         '''Classifies the laser into probler subclass depending on laser type'''
         try:
             if '-06-' in self.modelnumber:
-                if '532' in self.modelnumber[0:4] or '561' in self.modelnumber[0:4] or '553' in self.modelnumber[0:4]:
+                if '-91-' in self.modelnumber[0:4] or '-93-' in self.modelnumber[0:4]:
                     self.__class__=Cobolt06DPL
                 else:
                     self.__class__=Cobolt06MLD
@@ -165,11 +165,16 @@ class CoboltLaser():
     def constant_current(self,current=None):
         '''Enter constant current mode, current in mA ''' 
         if current!=None:
-            self.send_cmd(f'slc {current}')
+            if not '-08-' in self.modelnumber or not '-06-' in self.modelnumber:
+                self.send_cmd(f'slc {current/1000}')
+            else:
+                self.send_cmd(f'slc {current}')
         return self.send_cmd(f'ci')
 
     def set_current(self, current):
         '''Set laser current in mA'''
+        if not '-08-' in self.modelnumber or not '-06-' in self.modelnumber:
+            current=current/1000
         return self.send_cmd(f'slc {current}')
 
     
