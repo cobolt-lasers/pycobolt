@@ -9,9 +9,8 @@ This package is under development and is not officially released yet. Feel free 
 
 
 ## Build and Installation
-```
 Install from main development branch
-
+```
 python -m pip install git+https://github.com/cobolt-lasers/pycobolt.git
 ```
 
