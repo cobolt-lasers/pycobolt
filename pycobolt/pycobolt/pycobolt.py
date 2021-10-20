@@ -78,11 +78,12 @@ class CoboltLaser():
     def _classify_(self):
         '''Classifies the laser into probler subclass depending on laser type'''
         try:
-            if '-06-' in self.modelnumber:
-                if '-91-' in self.modelnumber[0:4] or '-93-' in self.modelnumber[0:4]:
-                    self.__class__=Cobolt06DPL
-                else:
-                    self.__class__=Cobolt06MLD
+            if not '-71-' in self.modelnumber:
+                if '-06-' in self.modelnumber:
+                    if '-91-' in self.modelnumber[0:4] or '-93-' in self.modelnumber[0:4]:
+                        self.__class__=Cobolt06DPL
+                    else:
+                        self.__class__=Cobolt06MLD
         except:
             pass
     
