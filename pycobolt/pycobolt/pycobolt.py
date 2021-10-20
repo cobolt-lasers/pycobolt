@@ -88,16 +88,19 @@ class CoboltLaser():
     
     def is_connected(self): 
         """Ask if laser is connected"""
-        if self.adress.is_open:
-            try:
-                test=self.send_cmd('?')
-                if test=='OK':
-                    return True
-                else:
+        try:
+            if self.adress.is_open:
+                try:
+                    test=self.send_cmd('?')
+                    if test=='OK':
+                        return True
+                    else:
+                        return False
+                except:
                     return False
-            except:
+            else:
                 return False
-        else:
+        except:
             return False
     
     def disconnect(self): 
