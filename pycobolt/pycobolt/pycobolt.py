@@ -259,6 +259,13 @@ class CoboltLaser():
 
         return "Syntax Error: No response"
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.turn_off()
+        self.disconnect()
+
 
 class Cobolt06MLD(CoboltLaser):
     '''For lasers of type 06-MLD'''
@@ -381,5 +388,4 @@ def list_lasers():
         except:
             pass
     return lasers
-    
 
