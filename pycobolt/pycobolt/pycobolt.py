@@ -16,7 +16,7 @@ class CoboltLaser:
         self.port = port
         self.modelnumber = None
         self.baudrate = baudrate
-        self.adress = None
+        self.address = None
         self.connect()
 
     def __str__(self):
@@ -28,45 +28,53 @@ class CoboltLaser:
             )
 
     def connect(self):
-        """Connects the laser on using a specified COM-port (preferred) or serial number. \n Will throw exception if it cannot connect to specified port or find laser with given serial number"""
+        """Connects the laser on using a specified COM-port (preferred) or serial number. Will throw exception if it cannot connect to specified port or find laser with given serial number.
+
+        Raises:
+            SerialException: serial port error
+            RuntimeError: no laser found
+        """
 
         if self.port != None:
             try:
-                self.adress = serial.Serial(self.port, self.baudrate, timeout=1)
-            except Exception as error:
-                self.adress = None
-                raise SerialException(f'{self.port} not accesible. Error: {error}')
+                self.address = serial.Serial(self.port, self.baudrate, timeout=1)
+            except Exception as err:
+                self.address = None
+                raise SerialException(f'{self.port} not accesible.') from err
 
         elif self.serialnumber != None:
             ports = list_ports.comports()
             for port in ports:
                 try:
-                    self.adress = serial.Serial(
+                    self.address = serial.Serial(
                         port.device, baudrate=self.baudrate, timeout=1
                     )
                     sn = self.send_cmd('sn?')
-                    self.adress.close()
+                    self.address.close()
                     if sn == self.serialnumber:
                         self.port = port.device
-                        self.adress = serial.Serial(self.port, baudrate=self.baudrate)
+                        self.address = serial.Serial(self.port, baudrate=self.baudrate)
                         break
                 except:
                     pass
             if self.port == None:
-                raise Exception('No laser found')
-        if self.adress != None:
+                raise RuntimeError('No laser found')
+        if self.address != None:
             self._identify_()
         if self.__class__ == CoboltLaser:
             self._classify_()
 
     def _identify_(self):
-        """Fetch Serial number and model number of laser. \n
-        Will raise exception and close connection if not connected to a cobolt laser"""
+        """Fetch Serial number and model number of laser. Will raise exception and close connection if not connected to a cobolt laser.
+
+        Raises:
+            RuntimeError: error identifying the laser model
+        """
         try:
             firmware = self.send_cmd('gfv?')
             if 'ERROR' in firmware:
                 self.disconnect()
-                raise Exception('Not a Cobolt laser')
+                raise RuntimeError('Not a Cobolt laser')
             self.serialnumber = self.send_cmd('sn?')
             if not '.' in firmware:
                 if '0' in self.serialnumber:
@@ -80,7 +88,7 @@ class CoboltLaser:
                 self.modelnumber = self.send_cmd('glm?')
         except:
             self.disconnect()
-            raise Exception('Not a Cobolt laser')
+            raise RuntimeError('Not a Cobolt laser')
 
     def _classify_(self):
         """Classifies the laser into probler subclass depending on laser type"""
@@ -100,7 +108,7 @@ class CoboltLaser:
     def is_connected(self):
         """Ask if laser is connected"""
         try:
-            if self.adress.is_open:
+            if self.address.is_open:
                 try:
                     test = self.send_cmd('?')
                     if test == 'OK':
@@ -116,8 +124,8 @@ class CoboltLaser:
 
     def disconnect(self):
         """Disconnect the laser"""
-        if self.adress != None:
-            self.adress.close()
+        if self.address != None:
+            self.address.close()
             self.serialnumber = None
             self.modelnumber = None
 
@@ -247,13 +255,13 @@ class CoboltLaser:
             The response recieved from the laser as string
 
         Raises:
-            RuntimeError: message failed
+            RuntimeError: sending the message failed
         """
         time_start = time.perf_counter()
         message += '\r'
         try:
             utf8_msg = message.encode()
-            self.adress.write(utf8_msg)
+            self.address.write(utf8_msg)
             logger.debug(f'sent laser [{self}] message [{utf8_msg}]')
         except Exception as e:
             raise RuntimeError('Error: write failed') from e
@@ -262,7 +270,7 @@ class CoboltLaser:
         while time_stamp < timeout:
 
             try:
-                received_string = self.adress.readline().decode()
+                received_string = self.address.readline().decode()
                 time_stamp = self._timeDiff_(time_start)
             except:
                 time_stamp = self._timeDiff_(time_start)
