@@ -197,9 +197,9 @@ class CoboltLaser:
                 self.send_cmd(f"slc {current/1000}")
             else:
                 self.send_cmd(f"slc {current}")
-            logger.info(f"Setting constant current mode with I = {current} mA")
+            logger.info(f"Entering constant current mode with I = {current} mA")
         else:
-            logger.info("Setting constant current mode")
+            logger.info("Entering constant current mode")
         return self.send_cmd(f"ci")
 
     def set_current(self, current):
