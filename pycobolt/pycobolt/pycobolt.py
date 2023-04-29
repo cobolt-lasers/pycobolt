@@ -1,15 +1,16 @@
 import serial
 from serial.tools import list_ports
 from serial import SerialException
-import time
-import sys
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class CoboltLaser:
-    """Creates a laser object using either COM-port or serial number to connect to laser. \n Will automatically return proper subclass, if applicable"""
+    """
+    Creates a laser object using either COM-port or serial number to connect to laser. Will automatically return proper
+    subclass, if applicable
+    """
 
     def __init__(self, port=None, serialnumber=None, baudrate=115200):
         self.serialnumber = serialnumber
@@ -21,51 +22,54 @@ class CoboltLaser:
 
     def __str__(self):
         try:
-            return f'Serial number: {self.serialnumber}, Model number: {self.modelnumber}, Wavelength: {"{:.0f}".format(float(self.modelnumber[0:4]))} nm, Type: {self.__class__.__name__}'
-        except:
-            return (
-                f"Serial number: {self.serialnumber}, Model number: {self.modelnumber}"
-            )
+            return f'Serial number: {self.serialnumber}, ' \
+                   f'Model number: {self.modelnumber}, ' \
+                   f'Wavelength: {self.modelnumber[0:4]:.0f} nm, ' \
+                   f'Type: {self.__class__.__name__}'
+        except TypeError:
+            return f"Serial number: {self.serialnumber}, Model number: {self.modelnumber}"
 
     def connect(self):
-        """Connects the laser on using a specified COM-port (preferred) or serial number. Will throw exception if it cannot connect to specified port or find laser with given serial number.
+        """
+        Connects the laser on using a specified COM-port (preferred) or serial number. Will throw exception if it
+        cannot connect to specified port or find laser with given serial number.
 
         Raises:
             SerialException: serial port error
             RuntimeError: no laser found
         """
 
-        if self.port != None:
+        if self.port is not None:
             try:
                 self.address = serial.Serial(self.port, self.baudrate, timeout=1)
-            except Exception as err:
+            except serial.SerialException as err:
                 self.address = None
-                raise SerialException(f"{self.port} not accesible.") from err
+                raise SerialException(f"{self.port} not accessible.") from err
 
-        elif self.serialnumber != None:
+        elif self.serialnumber is not None:
             ports = list_ports.comports()
             for port in ports:
                 try:
-                    self.address = serial.Serial(
-                        port.device, baudrate=self.baudrate, timeout=1
-                    )
+                    self.address = serial.Serial(port.device, baudrate=self.baudrate, timeout=1)
                     sn = self.send_cmd("sn?")
                     self.address.close()
                     if sn == self.serialnumber:
                         self.port = port.device
                         self.address = serial.Serial(self.port, baudrate=self.baudrate)
                         break
-                except:
+                except (serial.SerialException, RuntimeError):
                     pass
-            if self.port == None:
+            if self.port is None:
                 raise RuntimeError("No laser found")
-        if self.address != None:
+        if self.address is not None:
             self._identify_()
         if self.__class__ == CoboltLaser:
             self._classify_()
 
     def _identify_(self):
-        """Fetch Serial number and model number of laser. Will raise exception and close connection if not connected to a cobolt laser.
+        """
+        Fetch Serial number and model number of laser. Will raise exception and close connection if not connected to
+        a Cobolt laser.
 
         Raises:
             RuntimeError: error identifying the laser model
@@ -76,80 +80,62 @@ class CoboltLaser:
                 self.disconnect()
                 raise RuntimeError("Not a Cobolt laser")
             self.serialnumber = self.send_cmd("sn?")
-            if not "." in firmware:
+            if "." not in firmware:
                 if "0" in self.serialnumber:
-                    self.modelnumber = (
-                        f"0{self.serialnumber.partition(str(0))[0]}-04-XX-XXXX-XXX"
-                    )
-                    self.serialnumber = self.serialnumber.partition("0")[2]
-                    while self.serialnumber[0] == "0":
-                        self.serialnumber = self.serialnumber[1:]
+                    self.modelnumber = f"0{self.serialnumber.partition('0')[0]}-04-XX-XXXX-XXX"
+                    self.serialnumber = self.serialnumber.partition('0')[2].lstrip('0')
             else:
                 self.modelnumber = self.send_cmd("glm?")
-        except:
+        except (RuntimeError, TypeError):
             self.disconnect()
             raise RuntimeError("Not a Cobolt laser")
 
     def _classify_(self):
-        """Classifies the laser into probler subclass depending on laser type"""
+        """Classifies the laser into proper subclass depending on laser type"""
         try:
-            if not "-71-" in self.modelnumber:
-                if "-06-" in self.modelnumber:
-                    if (
-                        "-91-" in self.modelnumber[0:4]
-                        or "-93-" in self.modelnumber[0:4]
-                    ):
-                        self.__class__ = Cobolt06DPL
-                    else:
-                        self.__class__ = Cobolt06MLD
-        except:
+            if "-71-" not in self.modelnumber and "-06-" in self.modelnumber and \
+                    ("-91-" in self.modelnumber[0:4] or "-93-" in self.modelnumber[0:4]):
+                self.__class__ = Cobolt06DPL
+            else:
+                self.__class__ = Cobolt06MLD
+        except TypeError:
             pass
 
     def is_connected(self):
         """Ask if laser is connected"""
         try:
             if self.address.is_open:
-                try:
-                    test = self.send_cmd("?")
-                    if test == "OK":
-                        return True
-                    else:
-                        return False
-                except:
-                    return False
-            else:
-                return False
-        except:
+                return self.send_cmd("?") == "OK"
+        except (serial.SerialException, RuntimeError):
             return False
+        return False
 
     def disconnect(self):
         """Disconnect the laser"""
-        if self.address != None:
+        if self.address is not None:
             self.address.close()
             self.serialnumber = None
             self.modelnumber = None
 
     def turn_on(self):
-        """Turn on the laser with the autostart sequence.The laser will await the TEC setpoints and pass a warm-up state"""
+        """
+        Turn on the laser with the autostart sequence.The laser will await the TEC setpoints and pass a warm-up state
+        """
         logger.info("Turning on laser")
-        return self.send_cmd(f"@cob1")
+        return self.send_cmd("@cob1")
 
     def turn_off(self):
         """Turn off the laser"""
         logger.info("Turning off laser")
-        return self.send_cmd(f"l0")
+        return self.send_cmd("l0")
 
     def is_on(self):
         """Ask if laser is turned on"""
-        answer = self.send_cmd(f"l?")
-        if answer == "1":
-            return True
-        else:
-            return False
+        return self.send_cmd("l?") == "1"
 
     def interlock(self):
         """Returns: 0 if closed, 1 if open"""
-        return self.send_cmd(f"ilk?")
+        return self.send_cmd("ilk?")
 
     def get_fault(self):
         """Get laser fault"""
@@ -160,7 +146,7 @@ class CoboltLaser:
             "4": "4 - Constant power time out",
         }
         fault = self.send_cmd("f?")
-        return faults.get(fault, fault)
+        return faults.get(fault)
 
     def clear_fault(self):
         """Clear laser fault"""
@@ -174,7 +160,7 @@ class CoboltLaser:
             "2": "2 - Modulation Mode",
         }
         mode = self.send_cmd("gam?")
-        return modes.get(mode, mode)
+        return modes.get(mode)
 
     def get_state(self):
         """Get autostart state"""
@@ -188,106 +174,88 @@ class CoboltLaser:
             "6": "6 - Aborted",
         }
         state = self.send_cmd("gom?")
-        return states.get(state, state)
+        return states.get(state)
 
     def constant_current(self, current=None):
         """Enter constant current mode, current in mA"""
-        if current != None:
-            if not "-08-" in self.modelnumber or not "-06-" in self.modelnumber:
-                self.send_cmd(f"slc {current/1000}")
+        if current is not None:
+            if "-08-" not in self.modelnumber or "-06-" not in self.modelnumber:
+                self.send_cmd(f"slc {current / 1000}")
             else:
                 self.send_cmd(f"slc {current}")
             logger.info(f"Entering constant current mode with I = {current} mA")
         else:
             logger.info("Entering constant current mode")
-        return self.send_cmd(f"ci")
+        return self.send_cmd("ci")
 
     def set_current(self, current):
         """Set laser current in mA"""
         logger.info(f"Setting I = {current} mA")
-        if not "-08-" in self.modelnumber or not "-06-" in self.modelnumber:
+        if "-08-" not in self.modelnumber or "-06-" not in self.modelnumber:
             current = current / 1000
         return self.send_cmd(f"slc {current}")
 
     def get_current(self):
         """Get laser current in mA"""
-        return float(self.send_cmd(f"i?"))
+        return float(self.send_cmd("i?"))
 
     def get_current_setpoint(self):
         """Get laser current setpoint in mA"""
-        return float(self.send_cmd(f"glc?"))
+        return float(self.send_cmd("glc?"))
 
     def constant_power(self, power=None):
         """Enter constant power mode, power in mW"""
-        if power != None:
-            self.send_cmd(f"p {float(power)/1000}")
+        if power is not None:
+            self.send_cmd(f"p {float(power) / 1000}")
             logger.info(f"Entering constant power mode with P = {power} mW")
         else:
             logger.info("Entering constant power mode")
-        return self.send_cmd(f"cp")
+        return self.send_cmd("cp")
 
     def set_power(self, power):
         """Set laser power in mW"""
         logger.info(f"Setting P = {power} mW")
-        return self.send_cmd(f"p {float(power)/1000}")
+        return self.send_cmd(f"p {float(power) / 1000}")
 
     def get_power(self):
         """Get laser power in mW"""
-        return float(self.send_cmd(f"pa?")) * 1000
+        return float(self.send_cmd("pa?")) * 1000
 
     def get_power_setpoint(self):
         """Get laser power setpoint in mW"""
-        return float(self.send_cmd(f"p?")) * 1000
+        return float(self.send_cmd("p?")) * 1000
 
     def get_ophours(self):
         """Get laser operational hours"""
-        return self.send_cmd(f"hrs?")
-
-    def _timeDiff_(self, time_start):
-        """time in ms"""
-        time_diff = time.perf_counter() - time_start
-        return time_diff
+        return self.send_cmd("hrs?")
 
     def send_cmd(self, message, timeout=1):
-        """Sends a message to the laset and awaits response until timeout (in s).
+        """Sends a message to the laser and awaits response until timeout (in s).
 
         Returns:
-            The response recieved from the laser as string
+            The response received from the laser as string
 
         Raises:
             RuntimeError: sending the message failed
         """
-        time_start = time.perf_counter()
         message += "\r"
+        utf8_msg = message.encode()
         try:
-            utf8_msg = message.encode()
             self.address.write(utf8_msg)
-            logger.debug(f"sent laser [{self}] message [{utf8_msg}]")
-        except Exception as e:
+        except serial.SerialException as e:
             raise RuntimeError("Error: write failed") from e
+        else:
+            logger.debug(f"sent laser [{self}] message [{utf8_msg}]")
 
-        time_stamp = 0
-        while time_stamp < timeout:
+        try:
+            self.address.timeout = timeout
+            received_string = self.address.readline().decode().rstrip()
+        except serial.SerialException:
+            raise RuntimeError("Syntax Error: No response")
+        else:
+            logger.debug(f"received from laser [{self}] message [{received_string}]")
 
-            try:
-                received_string = self.address.readline().decode()
-                time_stamp = self._timeDiff_(time_start)
-            except:
-                time_stamp = self._timeDiff_(time_start)
-                continue
-
-            if len(received_string) > 1:
-                while (received_string[-1] == "\n") or (received_string[-1] == "\r"):
-                    received_string = received_string[0:-1]
-                    if len(received_string) < 1:
-                        break
-
-                logger.debug(
-                    f"received from laser [{self}] message [{received_string}]"
-                )
-                return received_string
-
-        raise RuntimeError("Syntax Error: No response")
+        return received_string
 
     def __enter__(self):
         return self
@@ -309,8 +277,8 @@ class Cobolt06MLD(CoboltLaser):
         Args:
             power: modulation power (mW)
         """
-        logger.info(f"Entering modulation mode")
-        if power != None:
+        logger.info("Entering modulation mode")
+        if power is not None:
             self.send_cmd(f"slmp {power}")
         return self.send_cmd("em")
 
@@ -324,10 +292,7 @@ class Cobolt06MLD(CoboltLaser):
 
     def on_off_modulation(self, enable):
         """Enable On/Off modulation mode by enable=1, turn off by enable=0"""
-        if enable == 1:
-            return self.send_cmd("eoom")
-        elif enable == 0:
-            return self.send_cmd("xoom")
+        return self.send_cmd('eoom' if enable else 'xoom')
 
     def get_modulation_state(self):
         """Get the laser modulation settings as [analog, digital]"""
@@ -365,8 +330,8 @@ class Cobolt06DPL(CoboltLaser):
         super().__init__(port, serialnumber)
 
     def modulation_mode(self, highI=None):
-        """Enter Modulation mode, with possibiity to set the modulation high current level in mA (**kwarg)"""
-        if highI != None:
+        """Enter Modulation mode, with possibility to set the modulation high current level in mA (**kwarg)"""
+        if highI is not None:
             self.send_cmd(f"smc {highI}")
         return self.send_cmd("em")
 
@@ -393,7 +358,7 @@ class Cobolt06DPL(CoboltLaser):
         return self.send_cmd(f"slth {lowI}")
 
     def get_modulation_current(self):
-        """Return the modulation currrent setpoints in mA as [highCurrent,lowCurrent]"""
+        """Return the modulation current setpoints in mA as [highCurrent,lowCurrent]"""
         highI = float(self.send_cmd("gmc?"))
         lowI = float(self.send_cmd("glth?"))
         return [highI, lowI]
@@ -406,7 +371,7 @@ class Cobolt06DPL(CoboltLaser):
         """Set the temperature of the modulation TEC in °C"""
         return self.send_cmd(f"stec4t {temperature}")
 
-    def get_modualtion_tec_setpoint(self):
+    def get_modulation_tec_setpoint(self):
         """Get the setpoint of the modulation TEC in °C"""
         return float(self.send_cmd("gtec4t?"))
 
@@ -418,10 +383,10 @@ def list_lasers():
     for port in ports:
         try:
             laser = CoboltLaser(port=port.device)
-            if laser.serialnumber == None or laser.serialnumber.startswith("Syntax"):
+            if laser.serialnumber is None or laser.serialnumber.startswith("Syntax"):
                 del laser
             else:
                 lasers.append(laser)
-        except:
+        except (serial.SerialException, RuntimeError):
             pass
     return lasers
