@@ -146,7 +146,7 @@ class CoboltLaser:
             "4": "4 - Constant power time out",
         }
         fault = self.send_cmd("f?")
-        return faults.get(fault)
+        return faults.get(fault, default=fault)
 
     def clear_fault(self):
         """Clear laser fault"""
@@ -160,7 +160,7 @@ class CoboltLaser:
             "2": "2 - Modulation Mode",
         }
         mode = self.send_cmd("gam?")
-        return modes.get(mode)
+        return modes.get(mode, default=mode)
 
     def get_state(self):
         """Get autostart state"""
@@ -174,7 +174,7 @@ class CoboltLaser:
             "6": "6 - Aborted",
         }
         state = self.send_cmd("gom?")
-        return states.get(state)
+        return states.get(state, default=state)
 
     def constant_current(self, current=None):
         """Enter constant current mode, current in mA"""
