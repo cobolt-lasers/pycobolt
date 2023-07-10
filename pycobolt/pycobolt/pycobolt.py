@@ -22,12 +22,16 @@ class CoboltLaser:
 
     def __str__(self):
         try:
-            return f'Serial number: {self.serialnumber}, ' \
-                   f'Model number: {self.modelnumber}, ' \
-                   f'Wavelength: {self.modelnumber[0:4]:.0f} nm, ' \
-                   f'Type: {self.__class__.__name__}'
+            return (
+                f"Serial number: {self.serialnumber}, "
+                f"Model number: {self.modelnumber}, "
+                f"Wavelength: {self.modelnumber[0:4]:.0f} nm, "
+                f"Type: {self.__class__.__name__}"
+            )
         except TypeError:
-            return f"Serial number: {self.serialnumber}, Model number: {self.modelnumber}"
+            return (
+                f"Serial number: {self.serialnumber}, Model number: {self.modelnumber}"
+            )
 
     def connect(self):
         """
@@ -50,7 +54,9 @@ class CoboltLaser:
             ports = list_ports.comports()
             for port in ports:
                 try:
-                    self.address = serial.Serial(port.device, baudrate=self.baudrate, timeout=1)
+                    self.address = serial.Serial(
+                        port.device, baudrate=self.baudrate, timeout=1
+                    )
                     sn = self.send_cmd("sn?")
                     self.address.close()
                     if sn == self.serialnumber:
@@ -82,8 +88,10 @@ class CoboltLaser:
             self.serialnumber = self.send_cmd("sn?")
             if "." not in firmware:
                 if "0" in self.serialnumber:
-                    self.modelnumber = f"0{self.serialnumber.partition('0')[0]}-04-XX-XXXX-XXX"
-                    self.serialnumber = self.serialnumber.partition('0')[2].lstrip('0')
+                    self.modelnumber = (
+                        f"0{self.serialnumber.partition('0')[0]}-04-XX-XXXX-XXX"
+                    )
+                    self.serialnumber = self.serialnumber.partition("0")[2].lstrip("0")
             else:
                 self.modelnumber = self.send_cmd("glm?")
         except (RuntimeError, TypeError):
@@ -93,8 +101,11 @@ class CoboltLaser:
     def _classify_(self):
         """Classifies the laser into proper subclass depending on laser type"""
         try:
-            if "-71-" not in self.modelnumber and "-06-" in self.modelnumber and \
-                    ("-91-" in self.modelnumber[0:4] or "-93-" in self.modelnumber[0:4]):
+            if (
+                "-71-" not in self.modelnumber
+                and "-06-" in self.modelnumber
+                and ("-91-" in self.modelnumber[0:4] or "-93-" in self.modelnumber[0:4])
+            ):
                 self.__class__ = Cobolt06DPL
             else:
                 self.__class__ = Cobolt06MLD
@@ -292,7 +303,7 @@ class Cobolt06MLD(CoboltLaser):
 
     def on_off_modulation(self, enable):
         """Enable On/Off modulation mode by enable=1, turn off by enable=0"""
-        return self.send_cmd('eoom' if enable else 'xoom')
+        return self.send_cmd("eoom" if enable else "xoom")
 
     def get_modulation_state(self):
         """Get the laser modulation settings as [analog, digital]"""
