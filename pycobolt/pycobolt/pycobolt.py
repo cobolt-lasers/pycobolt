@@ -19,7 +19,7 @@ class CoboltLaser:
         baudrate: int = 115200,
     ):
         self.msg_timer = time.perf_counter()
-        self.serialnumber = serialnumber
+        self.serialnumber = str(serialnumber)
         self.port = port
         self.modelnumber = None
         self.baudrate = baudrate
@@ -48,20 +48,25 @@ class CoboltLaser:
                 raise SerialException(f"{self.port} not accesible.") from err
 
         elif self.serialnumber != None:
-            ports = list_ports.comports()
-            for port in ports:
-                try:
-                    self.address = serial.Serial(
-                        port.device, baudrate=self.baudrate, timeout=1
-                    )
-                    sn = self.send_cmd("sn?")
-                    self.address.close()
-                    if sn == self.serialnumber:
-                        self.port = port.device
-                        self.address = serial.Serial(self.port, baudrate=self.baudrate)
-                        break
-                except:
-                    pass
+            ports = [x for x in list_ports.comports() if "USB" in x.hwid]
+            try:
+                port=next([item for item in ports if self.serialnumber in item.serial_number])
+                self.port=port.device
+                self.address = serial.Serial(self.port, self.baudrate, timeout=1)
+            except:
+                for port in ports:
+                    try:
+                        self.address = serial.Serial(
+                            port.device, baudrate=self.baudrate, timeout=1
+                        )
+                        sn = self.send_cmd("sn?")
+                        self.address.close()
+                        if sn == self.serialnumber:
+                            self.port = port.device
+                            self.address = serial.Serial(self.port, baudrate=self.baudrate)
+                            break
+                    except:
+                        pass
             if self.port == None:
                 raise RuntimeError("No laser found")
         if self.address != None:
@@ -279,6 +284,29 @@ class Cobolt06(CoboltLaser):
     ):
         super().__init__(port, serialnumber, baudrate)
 
+
+
+    def constant_power(self, power:float|None=None):
+        """Enter constant power mode, power in mW"""
+        if power != None:
+            self.send_cmd(f"LASer:CP:POWer:SETPoint {float(power)}")
+            logger.info(f"Entering constant power mode with P = {power} mW")
+        else:
+            logger.info("Entering constant power mode")
+        return self.send_cmd(f"laser:runmode ConstantPower")
+
+    def set_power(self, power:float):
+        """Set laser power in mW"""
+        logger.info(f"Setting P = {power} mW")
+        return self.send_cmd(f"LASer:CP:POWer:SETPoint {float(power)}")
+
+    def get_power(self):
+        """Get laser power in mW"""
+        return float(self.send_cmd(f"LASer:POWer?")) 
+
+    def get_power_setpoint(self):
+        """Get laser power setpoint in mW"""
+        return float(self.send_cmd(f"LASer:CP:POWer:SETPoint?")) 
 
     def power_modulation_mode(self, digital_enabled:bool=True,analog_enabled:bool=False ):
         '''06-MLD: Use power modulation for digital modulation up to 10 MHz and/or analog modulation up to 10 Hz 
