@@ -18,5 +18,5 @@ python -m pip install git+https://github.com/cobolt-lasers/pycobolt.git
 ```python
 import pycobolt
 
-laser = pycobolt.CoboltLaser() # Creates a new Cobolt Laser object.
+laser = pycobolt.CoboltLaser(port="COMXX") # Creates a new Cobolt Laser object. Replace COMXX with the com-port of the laser
 ```
