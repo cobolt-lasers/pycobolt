@@ -19,7 +19,7 @@ class CoboltLaser:
         baudrate: int = 115200,
     ):
         self.msg_timer = time.perf_counter()
-        self.serialnumber = str(serialnumber)
+        self.serialnumber = str(serialnumber) if serialnumber else None
         self.port = port
         self.modelnumber = None
         self.baudrate = baudrate
@@ -244,7 +244,7 @@ class CoboltLaser:
         if timeout:
             self.address.timeout = timeout
         message += "\r"
-        while time.perf_counter()-self.msg_timer<0.100: #to prevent issues with sending commands too rapidly 
+        while time.perf_counter()-self.msg_timer<0.100: #to prevent issues with sending commands too rapidly
             continue
         try:
             utf8_msg = message.encode()
@@ -302,14 +302,14 @@ class Cobolt06(CoboltLaser):
 
     def get_power(self):
         """Get laser power in mW"""
-        return float(self.send_cmd(f"LASer:POWer?")) 
+        return float(self.send_cmd(f"LASer:POWer?"))
 
     def get_power_setpoint(self):
         """Get laser power setpoint in mW"""
-        return float(self.send_cmd(f"LASer:CP:POWer:SETPoint?")) 
+        return float(self.send_cmd(f"LASer:CP:POWer:SETPoint?"))
 
     def power_modulation_mode(self, digital_enabled:bool=True,analog_enabled:bool=False ):
-        '''06-MLD: Use power modulation for digital modulation up to 10 MHz and/or analog modulation up to 10 Hz 
+        '''06-MLD: Use power modulation for digital modulation up to 10 MHz and/or analog modulation up to 10 Hz
         06-DPL: Use power modulation for digital modulation up to 1 kHz and/or analog modulation up to 1kHz '''
         self.send_cmd("LAS:RUNM PowerModulation")
         if analog_enabled:
@@ -323,7 +323,7 @@ class Cobolt06(CoboltLaser):
 
 
     def current_modulation_mode(self, digital_enabled:bool=True,analog_enabled:bool=False ):
-        '''06-MLD: Use power modulation for digital modulation above 10 MHz and/or analog modulation above 10 Hz 
+        '''06-MLD: Use power modulation for digital modulation above 10 MHz and/or analog modulation above 10 Hz
         06-DPL: Use power modulation for digital modulation above 1 kHz and/or analog modulation above 1kHz '''
 
         self.send_cmd("LAS:RUNM CurrentModulation")
@@ -342,8 +342,8 @@ class Cobolt06(CoboltLaser):
         if power_mod:
             self.send_cmd(f"las:pm:dig:ena {enable}")
         if current_mod:
-            self.send_cmd(f"las:cm:dig:ena {enable}")      
-    
+            self.send_cmd(f"las:cm:dig:ena {enable}")
+
     def analog_modulation(self, enable, power_mod:bool=True, current_mod:bool=False):
         """Enable analog modulation mode by enable=1, turn off by enable=0
         """
@@ -403,9 +403,9 @@ class Cobolt06(CoboltLaser):
         return self.send_cmd("LASer:RUNMode?")
 
     def get_state(self):
-        """Get autostart state""" 
+        """Get autostart state"""
         return self.send_cmd("state?")
-    
+
     def get_modulation_state(self):
         """Get the laser modulation settings as [digital, analog] for the active run mode"""
         rm=self.send_cmd("laser:runmode?")
@@ -414,7 +414,7 @@ class Cobolt06(CoboltLaser):
             dm = self.send_cmd(f"las:{rm}:dig:ena?")
             am = self.send_cmd(f"las:{rm}:ana:ena?")
             return [dm,am]
-        
+
     def set_analog_impedance(self, arg:str):
         """Set the impedance of the analog modulation.
 
@@ -427,10 +427,10 @@ class Cobolt06(CoboltLaser):
         """Get the impedance of the analog modulation \n
         return: 'high' for HighZ and 'low' for 50 Ohm"""
         return self.send_cmd("SYSTem:INPut:ANAlog:IMPedance?")
-    
+
     def set_analog_voltage_range(self,arg):
         """Set maximum voltage for the anaglog input signal
-        
+
         Args:
             arg: 1 for 1 V, 5 for 5 V"""
         return self.send_cmd(f"SYSTem:INPut:ANAlog:VOLTage:RANGe:MAX {arg}")
@@ -439,7 +439,7 @@ class Cobolt06(CoboltLaser):
         """Set maximum voltage for the anaglog input signal
         return: 1 for 1 V, 5 for 5 V"""
         return self.send_cmd(f"SYSTem:INPut:ANAlog:VOLTage:RANGe:MAX?")
-        
+
     def pause_emission(self):
         """Pause laser emission without turning off the laser"""
         self.send_cmd("las:paus 1")
