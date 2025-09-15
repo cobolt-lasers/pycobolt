@@ -191,7 +191,7 @@ class CoboltLaser:
     def set_current(self, current:float):
         """Set laser current in mA"""
         logger.info(f"Setting I = {current} mA")
-        if not "-08-" in self.modelnumber or not "-06-" in self.modelnumber:
+        if not ("-08-" in self.modelnumber or "-06-" in self.modelnumber):
             current = current / 1000
         return self.send_cmd(f"slc {current}")
 
